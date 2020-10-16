@@ -72,17 +72,27 @@ def visualize_optimal(mat,filename, radius):
                     file.write(string)
                     string2 = "\draw[->] (" + str(mat[i-1][j]["name"]) + ") -- (" + mat[i][j]["name"] + ");\n    "
                     file.write(string2)
-            elif j==i: #we are at the right sie of the tree. the only possible parent is at (i-1,j-1)
+            elif j==i: #we are at the right side of the tree. the only possible parent is at (i-1,j-1)
                 if mat[i-1][j-1]["col1"] == "green": #if we continue to open boxes in the last node.
                     string = "\DoNode[below of=" + mat[i-1][j-1]["name"] + ", right of= " + mat[i-1][j-1]["name"] + "]{"+ mat[i][j]["name"] +"}{" + str(mat[i][j]["e0"]) + "}{" + str(mat[i][j]["e1"]) + "}{1}{" + str(mat[i][j]["col1"]) + "}{" + str(mat[i][j]["col2"]) + "}{" + str(radius) + "};\n    "
                     file.write(string)
                     string2 = "\draw[->] (" + str(mat[i-1][j-1]["name"]) + ") -- (" + mat[i][j]["name"] + ");\n    "
                     file.write(string2)
+            else: #we are not on either side of the tree
+                if mat[i-1][j-1]["col1"]=="green": #if the left top node is a parent
+                    string = "\DoNode[below of=" + mat[i-1][j-1]["name"] + ", right of= " + mat[i-1][j-1]["name"] + "]{"+ mat[i][j]["name"] +"}{" + str(mat[i][j]["e0"]) + "}{" + str(mat[i][j]["e1"]) + "}{1}{" + str(mat[i][j]["col1"]) + "}{" + str(mat[i][j]["col2"]) + "}{" + str(radius) + "};\n    "
+                    file.write(string)
+                    string2 = "\draw[->] (" + str(mat[i-1][j-1]["name"]) + ") -- (" + mat[i][j]["name"] + ");\n    "
+                    file.write(string2)
+                    if mat[i-1][j]["col1"] == "green": #if the top right node also is a parent
+                        string3 = "\draw[->] (" + str(mat[i-1][j]["name"]) + ") -- (" + mat[i][j]["name"] + ");\n    "
+                        file.write(string3)
+                elif mat[i-1][j-1]["col1"] != "green" and mat[i-1][j]["col1"]=="green": #left is not a parent, but the right is
+                    string = "\DoNode[below of=" + mat[i-1][j]["name"] + ", left of= " + mat[i-1][j]["name"] + "]{"+ mat[i][j]["name"] +"}{" + str(mat[i][j]["e0"]) + "}{" + str(mat[i][j]["e1"]) + "}{1}{" + str(mat[i][j]["col1"]) + "}{" + str(mat[i][j]["col2"]) + "}{" + str(radius) + "};\n    "
+                    file.write(string)
+                    string2 = "\draw[->] (" + str(mat[i-1][j]["name"]) + ") -- (" + mat[i][j]["name"] + ");\n    "
+                    file.write(string2)
                     
-    
-    
-    
-    
     end_of_file= r"""
 \end{tikzpicture}
 """
@@ -90,6 +100,6 @@ def visualize_optimal(mat,filename, radius):
     
     file.close()
     
-visualize_optimal(nodes,"latex_test3.tex",1.2)
+visualize_optimal(nodes,"latex_test4.tex",1.2)
 #file2 = open("latex_test2.tex",'a')
 #file2.close()
