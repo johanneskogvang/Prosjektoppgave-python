@@ -22,7 +22,7 @@ def beta(u_i,i,n):
     
 def rho(i,u_i,n):
     #=number of boxes
-    #Rho(i,x) = P(u_12 >= 7 | u_i=x) = P(red majority given u_i=x)
+    #Rho(i,x) = P(u_12 >= 7 | U_i=u_i) = P(red majority given U_i=u_i)
     
     #numerator=P(u_12 >= 7 and u_i=x) = P(majority red and u_i=x)
     nume=0
