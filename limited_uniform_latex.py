@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Fri Oct 16 12:02:26 2020
+Created on Sat Oct 17 13:34:45 2020
 
 @author: Johan
 """
@@ -73,27 +73,29 @@ def find_prob_loss_0_1(n,alpha):
                     m[i,u_i]={"prob":r,"Loss0":L0,"Loss1":L1,"Loss2":1000}
     return m
 
-def find_loss2(matrix,n,alpha): 
+def find_loss2(matrix,n,alpha,beta):
+#def find_loss2(matrix,n,alpha): 
     for i in range(n-2,-1,-1): 
         #looping from the second to last row of the matrix to the first one
+        #P(T=i+1|T>i) = 1/(12-i) =  P(get stopped in next | not stopped until now) = PT
+        PT = 1/(n-i)        
         for u_i in range(0,i+1):
             #expected loss if the next one is yellow:
             EL_0 = min(matrix[i+1,u_i]["Loss0"],matrix[i+1,u_i]["Loss1"],matrix[i+1,u_i]["Loss2"])
             #expected loss if the next one is red. 
             EL_1 = min(matrix[i+1,u_i+1]["Loss0"],matrix[i+1,u_i+1]["Loss1"],matrix[i+1,u_i+1]["Loss2"])
             eps=epsilon(u_i,i,n)
-            matrix[i,u_i]["Loss2"]=alpha + (1-eps)*EL_0 + eps*EL_1    
+            matrix[i,u_i]["Loss2"]=alpha + (1-PT)*((1-eps)*EL_0 + eps*EL_1) + PT*beta    
     return matrix
 
 
  
 
-def make_matrix(n,alpha):
+def make_matrix(n,alpha, beta):
     matrix=find_prob_loss_0_1(n,alpha)
-    matrix=find_loss2(matrix,n,alpha)
+    matrix=find_loss2(matrix,n,alpha,beta)
     return matrix
-#mat_losses=make_matrix(12,0.02)
-#print(mat_losses)
+
 
 
 #Now the matrix is done, the next step is then to find the optimal solution:
@@ -128,8 +130,7 @@ def make_node_matrix(matrix):
     
     return node_mat
 
-#nodes=make_node_matrix(mat_losses)
-#print(nodes)
+
 
 
 
@@ -152,9 +153,8 @@ def visualize_optimal(mat,filename, radius):
     
     n = len(mat)
     for i in range(1,n):
-        
-        #new part::: 
-        #to check if we have to break the loop (we have reached a decision in all of the nodes above)
+        #lage en loop her med sånn, hvis ingen av nodene i raden over er grønne, break out of these for loops. 
+        #could have made a while loop of this as well, but for now this is a for loop
         g=0
         if i>1:
             for j in range(i):
@@ -164,9 +164,10 @@ def visualize_optimal(mat,filename, radius):
                     #break out of the for loop
                 print("breaking loop at row", i)
                 break
-       #the new part stops here     
-            
+
+        #if some of the nodes above are green, we continue to build the tree:        
         for j in range(i+1):
+            #if mat[i-1][j-1]["col1"]!="green" and mat[i-1][j]["col1"] != "green": #if neither of the top nodes are parents
             
             if j==0: #we are at the left side of the tree. the only possible parent i at (i-1,j)
                 if mat[i-1][j]["col1"] == "green": #if we continue to open boxes in the last node
@@ -202,14 +203,28 @@ def visualize_optimal(mat,filename, radius):
     
     file.close()
     
-#visualize_optimal(nodes,"latex_test8.tex",0.6)
 
-def main(n, alpha, filename, node_radius):
-    mat_losses=make_matrix(n,alpha)
+
+def main(n,alpha,beta, filename, node_radius):
+    mat_losses=make_matrix(n,alpha,beta)
+    print(mat_losses)
     nodes=make_node_matrix(mat_losses)
-    visualize_optimal(nodes,filename,0.6)
+    visualize_optimal(nodes,filename, node_radius)
     
-main(12,0.000001,"unlimited_uniform_a0.000001.tex",0.4)
-
+#main(12,0.2,0.5,"limited_uniform_a0.2_b0.5.tex", 0.6)    
+main(12,0.07,0.1,"limited_uniform_a0.07_b0.1.tex", 0.6)    
+#print(make_matrix(12,0.0000000000000000001))
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     
