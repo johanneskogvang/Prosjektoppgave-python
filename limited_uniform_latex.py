@@ -72,13 +72,14 @@ def find_prob_loss_0_1(n,alpha):
                     #don't know the rest of the "loss2" yet, just putting it tp a high value. 
                     m[i,u_i]={"prob":r,"Loss0":L0,"Loss1":L1,"Loss2":1000}
     return m
-
+"""
 def find_loss2(matrix,n,alpha,beta):
 #def find_loss2(matrix,n,alpha): 
     for i in range(n-2,-1,-1): 
         #looping from the second to last row of the matrix to the first one
         #P(T=i+1|T>i) = 1/(12-i) =  P(get stopped in next | not stopped until now) = PT
-        PT = 1/(n-i)        
+        PT = 1/(n-i)    
+        print(PT)
         for u_i in range(0,i+1):
             #expected loss if the next one is yellow:
             EL_0 = min(matrix[i+1,u_i]["Loss0"],matrix[i+1,u_i]["Loss1"],matrix[i+1,u_i]["Loss2"])
@@ -87,8 +88,24 @@ def find_loss2(matrix,n,alpha,beta):
             eps=epsilon(u_i,i,n)
             matrix[i,u_i]["Loss2"]=alpha + (1-PT)*((1-eps)*EL_0 + eps*EL_1) + PT*beta    
     return matrix
-
-
+"""
+def find_loss2(matrix,n,alpha,beta):
+#def find_loss2(matrix,n,alpha): 
+    for i in range(n-2,-1,-1): 
+        #looping from the second to last row of the matrix to the first one
+        #P(T=i+1|T>i) = 1/(12-i) =  P(get stopped in next | not stopped until now) = PT
+        PT = 1/(n-i)
+        if i==0: #P(T=1|T>0)=0. means that you are able to open the first box without getting stopped
+            PT = 0
+        print(PT)
+        for u_i in range(0,i+1):
+            #expected loss if the next one is yellow:
+            EL_0 = min(matrix[i+1,u_i]["Loss0"],matrix[i+1,u_i]["Loss1"],matrix[i+1,u_i]["Loss2"])
+            #expected loss if the next one is red. 
+            EL_1 = min(matrix[i+1,u_i+1]["Loss0"],matrix[i+1,u_i+1]["Loss1"],matrix[i+1,u_i+1]["Loss2"])
+            eps=epsilon(u_i,i,n)
+            matrix[i,u_i]["Loss2"]=alpha + (1-PT)*((1-eps)*EL_0 + eps*EL_1) + PT*beta    
+    return matrix
  
 
 def make_matrix(n,alpha, beta):
@@ -212,7 +229,7 @@ def main(n,alpha,beta, filename, node_radius):
     visualize_optimal(nodes,filename, node_radius)
     
 #main(12,0.2,0.5,"limited_uniform_a0.2_b0.5.tex", 0.6)    
-main(12,0.07,0.1,"limited_uniform_a0.07_b0.1.tex", 0.6)    
+main(12,0.2,0.5,"limited_uniform_a0.2_b0.5.tex", 0.6)    
 #print(make_matrix(12,0.0000000000000000001))
     
     
