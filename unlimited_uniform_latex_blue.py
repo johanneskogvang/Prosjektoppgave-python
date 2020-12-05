@@ -134,14 +134,14 @@ def make_node_matrix(matrix):
 
 
 def visualize_optimal(mat,filename, radius):
-    file_location_and_name=r"C:\\Users\\Johan\\OneDrive\\Documents\\NTNU-Host-2020\\Prosjektoppgave\\Prosjektoppgave-python\\Tikz-trees\\" + filename 
+    file_location_and_name=r"C:\\Users\\Johan\\OneDrive\\Documents\\NTNU-Host-2020\\Prosjektoppgave\\Prosjektoppgave-python\\Tikz-trees2\\" + filename 
     file = open(file_location_and_name,"a")
 
     start_of_doc=r"""
 \begin{tikzpicture}[
     treenodeT/.style={
       circle, align=center},
-    node distance=1.5cm,
+    node distance=1cm,
     ]
     """
     file.write(start_of_doc)
@@ -207,9 +207,9 @@ def visualize_optimal(mat,filename, radius):
 def main(n, alpha, filename, node_radius):
     mat_losses=make_matrix(n,alpha)
     nodes=make_node_matrix(mat_losses)
-    visualize_optimal(nodes,filename,0.6)
+    visualize_optimal(nodes,filename,node_radius)
     
-main(12,0.000001,"unlimited_uniform_a0.000001.tex",0.4)
+main(12,0.05,"unlimited_uniform_a0.05.tex",0.4)
 
     
     

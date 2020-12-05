@@ -136,14 +136,14 @@ def make_node_matrix(matrix):
 
 
 def visualize_optimal(mat,filename, radius):
-    file_location_and_name=r"C:\\Users\\Johan\\OneDrive\\Documents\\NTNU-Host-2020\\Prosjektoppgave\\Prosjektoppgave-python\\Tikz-trees\\" + filename 
+    file_location_and_name=r"C:\\Users\\Johan\\OneDrive\\Documents\\NTNU-Host-2020\\Prosjektoppgave\\Prosjektoppgave-python\\Tikz-trees2\\" + filename 
     file = open(file_location_and_name,"a")
 
     start_of_doc=r"""
 \begin{tikzpicture}[
     treenodeT/.style={
       circle, align=center},
-    node distance=1.5cm,
+    node distance=1cm,
     ]
     """
     file.write(start_of_doc)
@@ -170,7 +170,7 @@ def visualize_optimal(mat,filename, radius):
         for j in range(i+1):
             #if mat[i-1][j-1]["col1"]!="green" and mat[i-1][j]["col1"] != "green": #if neither of the top nodes are parents
             
-            if j==0: #we are at the left side of the tree. the only possible parent i at (i-1,j)
+            if j==0: #we are at the left side of the tree. the only possible parent is at (i-1,j)
                 if mat[i-1][j]["col1"] == "green!70!black": #if we continue to open boxes in the last node
                     string = "\DoNode[below of=" + mat[i-1][j]["name"] + ", left of= " + mat[i-1][j]["name"] + "]{"+ mat[i][j]["name"] +"}{" + str(mat[i][j]["e0"]) + "}{" + str(mat[i][j]["e1"]) + "}{1}{" + str(mat[i][j]["col1"]) + "}{" + str(mat[i][j]["col2"]) + "}{" + str(radius) + "};\n    "
                     file.write(string)
@@ -204,19 +204,89 @@ def visualize_optimal(mat,filename, radius):
     
     file.close()
     
+    
+    
+def visualize_probs(matrix,filename,radius):
+    file_location_and_name=r"C:\\Users\\Johan\\OneDrive\\Documents\\NTNU-Host-2020\\Prosjektoppgave\\Prosjektoppgave-python\\Tikz-trees\\" + filename 
+    file = open(file_location_and_name,"a")
+
+    start_of_doc=r"""
+\begin{tikzpicture}[
+    treenodeT/.style={
+      circle, align=center},
+    node distance=1cm,
+    ]
+    """
+    file.write(start_of_doc)
+    
+    #the first node:
+    string = "\DoNode{N0-0}{0.5}{0.5}{0}{blue}{red}{" + str(radius) + "};\n    "
+    file.write(string)
+    
+    n = len(matrix)
+    for i in range(1,n):
+        for j in range(i+1):
+            #for all the nodes except the one to the far right:
+            name = "N"+str(i)+"-"+str(j)
+            name_parent_right = "N"+str(i-1)+"-"+str(j)
+            name_parent_left = "N"+str(i-1)+"-"+str(j-1)
+            prob = matrix[i][j]["prob"]
+            
+            if round(prob,14)==0.5:
+                col1="blue"
+                col2="red"
+            elif round(prob,14)>0.5:
+                col1 = "red"
+                col2 = "red"
+            else:
+                col1 = "blue"
+                col2 = "blue"
+            
+            
+            
+            
+            if j!=i: #if we are not to the very right
+            #make arrow from right parent:
+                string = "\DoNode[below of=" + name_parent_right + ", left of= " + name_parent_right + "]{"+ name +"}{" + str(1-prob) + "}{" + str(prob) + "}{0}{" + col1 + "}{" + col2 + "}{" + str(radius) + "};\n    "
+                file.write(string)
+                string2 = "\draw[->] (" + name_parent_right + ") -- (" + name + ");\n    "
+                file.write(string2)
+            if j==i: #if we are at the very right node there is no right parent
+                string = "\DoNode[below of=" + name_parent_left + ", right of= " + name_parent_left + "]{"+ name +"}{" + str(1-prob) + "}{" + str(prob) + "}{0}{" + col1 + "}{" + col2 + "}{" + str(radius) + "};\n    "
+                file.write(string)
+            if j != 0: #if we are not at the very left node, also need an arrow from left parent
+                string3 = "\draw[->] (" + name_parent_left + ") -- (" + name + ");\n    "
+                file.write(string3)    
+                
+                
+    end_of_file= r"""
+\end{tikzpicture}
+"""
+    file.write(end_of_file)
+    
+    file.close()
+    
+    
+        
 
 
-def main(n,alpha,beta, filename, node_radius):
+def exp_loss(n,alpha,beta, filename, node_radius):
     mat_losses=make_matrix(n,alpha,beta)
     print(mat_losses)
     nodes=make_node_matrix(mat_losses)
     visualize_optimal(nodes,filename, node_radius)
     
-#main(12,0.2,0.5,"limited_uniform_a0.2_b0.5.tex", 0.6)    
-main(12,0.2,0.5,"blue_limited_uniform_a0.2_b0.5.tex", 0.6)    
+#exp_loss(12,0.2,0.5,"blue_limited_uniform_a0.2_b0.5.tex", 0.6)    
 #print(make_matrix(12,0.0000000000000000001))
+
+
+def probs(n,alpha,beta,filename,node_radius):
+    mat_losses=make_matrix(n,alpha,beta) #this is the matrix with all the probabilities and expected losses
+    print(mat_losses)
+    visualize_probs(mat_losses,filename, node_radius)
     
-    
+probs(4,0.2,0.5,"test_prob_visualising.tex",0.4)
+     
     
     
     
